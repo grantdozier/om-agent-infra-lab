@@ -8,6 +8,7 @@ Identify operational records that need human QA attention before report finaliza
 
 - Missing proof gaps: 1
 - Proof exists but QA pending: 1
+- Overdue in-progress tasks: 1
 
 ---
 
@@ -35,10 +36,23 @@ Completed proof-required tasks where proof exists but QA review is missing or pe
 
 ---
 
+## Check 3 — In-Progress Tasks Past Due Date
+
+Tasks still marked in progress after their due date.
+
+1 overdue in-progress task(s) found.
+
+| Task ID | Task Type | Client Ref | Staff | Clinic | Due Date | Status |
+|---:|---|---|---|---|---|---|
+| 103 | chart_review | CLIENT-003 | Morgan Guidry | Crowley Clinic | 2026-05-02 | in_progress |
+
+---
+
 ## Interpretation
 
 - Missing-proof gaps need proof collection or task status correction.
 - Pending-QA items need reviewer action before final reporting.
+- Overdue in-progress tasks need owner follow-up or status correction.
 
 ## Source Tables
 

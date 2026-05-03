@@ -27,6 +27,7 @@ def run_sql_file(path: str) -> list[dict[str, str]]:
 
 proof_gap_rows = run_sql_file("prism_gap_check.sql")
 pending_qa_rows = run_sql_file("prism_pending_qa_check.sql")
+overdue_rows = run_sql_file("prism_overdue_in_progress_check.sql")
 
 lines = [
     "# Prism QA Proof-Gap Report",
@@ -39,6 +40,7 @@ lines = [
     "",
     f"- Missing proof gaps: {len(proof_gap_rows)}",
     f"- Proof exists but QA pending: {len(pending_qa_rows)}",
+    f"- Overdue in-progress tasks: {len(overdue_rows)}",
     "",
     "---",
     "",
@@ -89,10 +91,34 @@ lines.extend([
     "",
     "---",
     "",
+    "## Check 3 — In-Progress Tasks Past Due Date",
+    "",
+    "Tasks still marked in progress after their due date.",
+    "",
+])
+
+if not overdue_rows:
+    lines.append("No overdue in-progress tasks found.")
+else:
+    lines.append(f"{len(overdue_rows)} overdue in-progress task(s) found.")
+    lines.append("")
+    lines.append("| Task ID | Task Type | Client Ref | Staff | Clinic | Due Date | Status |")
+    lines.append("|---:|---|---|---|---|---|---|")
+    for row in overdue_rows:
+        lines.append(
+            f"| {row['task_id']} | {row['task_type']} | {row['client_ref']} | "
+            f"{row['full_name']} | {row['clinic']} | {row['due_date']} | {row['status']} |"
+        )
+
+lines.extend([
+    "",
+    "---",
+    "",
     "## Interpretation",
     "",
     "- Missing-proof gaps need proof collection or task status correction.",
     "- Pending-QA items need reviewer action before final reporting.",
+    "- Overdue in-progress tasks need owner follow-up or status correction.",
     "",
     "## Source Tables",
     "",
