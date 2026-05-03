@@ -1,0 +1,7 @@
+services:
+  mcp-gateway:
+    command:
+      - --transport=sse
+      - --secrets=/run/secrets/database-url
+      - --servers=postgres
+      - --tools=query_database

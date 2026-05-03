@@ -1,0 +1,15 @@
+services:
+  mcp-gateway:
+    command:
+      - --transport=sse
+      - --secrets=/run/secrets/database-server-env
+      - --servers=database-server
+      - --tools=query_database
+      - --tools=list_tables
+      - --tools=describe_table
+    secrets:
+      - database-server-env
+
+secrets:
+  database-server-env:
+    file: ./database-server.env

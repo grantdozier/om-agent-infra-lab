@@ -1,0 +1,14 @@
+services:
+  mcp-gateway:
+    depends_on:
+      database:
+        condition: service_healthy
+
+  agent:
+    depends_on:
+      database:
+        condition: service_healthy
+      importer:
+        condition: service_completed_successfully
+      mcp-gateway:
+        condition: service_started

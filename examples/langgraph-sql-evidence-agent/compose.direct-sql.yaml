@@ -1,0 +1,11 @@
+services:
+  agent:
+    environment:
+      - DATABASE_URL=postgresql://user:password@database:5432/database
+      - DATABASE_DIALECT=PostgreSQL
+      - QUESTION=Which sales support agent generated the highest invoice total in 2009?
+    depends_on:
+      database:
+        condition: service_healthy
+      importer:
+        condition: service_completed_successfully

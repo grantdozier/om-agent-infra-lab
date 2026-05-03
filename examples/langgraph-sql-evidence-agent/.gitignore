@@ -1,0 +1,13 @@
+/secret.*
+/.vscode
+/.venv
+/.mypy_cache
+/.ruff_cache
+/.python-version
+__pycache__
+*.pyc
+
+# local secrets / diagnostics
+secret.openai-api-key
+database-server.env
+docker-mcp.yaml
