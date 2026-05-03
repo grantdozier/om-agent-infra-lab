@@ -1,0 +1,18 @@
+services:
+  importer:
+    environment:
+      SQLITE_FILE: /app/PrismToy.db
+      DATABASE_URL: postgres://user:password@database:5432/database
+    volumes:
+      - ./PrismToy.db:/app/PrismToy.db
+
+  agent:
+    environment:
+      - DATABASE_URL=postgresql://user:password@database:5432/database
+      - DATABASE_DIALECT=PostgreSQL
+      - QUESTION=Inspect columns only for tasks, staff_members, proof_records, and qa_reviews. Then list completed tasks where tasks.requires_proof equals 1 and no matching proof_records row exists. Include tasks.task_id, tasks.task_type, tasks.client_ref, staff_members.full_name, staff_members.clinic, qa_reviews.review_status, and qa_reviews.issue_found.
+    depends_on:
+      database:
+        condition: service_healthy
+      importer:
+        condition: service_completed_successfully

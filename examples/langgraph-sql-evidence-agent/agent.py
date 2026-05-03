@@ -42,12 +42,21 @@ def run_read_only_sql(query: str) -> str:
 
     query = query.strip().rstrip(";")
 
-    with psycopg.connect(database_url, row_factory=dict_row, connect_timeout=10) as conn:
-        with conn.cursor() as cur:
-            cur.execute("SET statement_timeout = '10s';")
-            cur.execute(query)
-            rows = cur.fetchmany(25)
-            return json.dumps(rows, default=_json_default, indent=2)
+    try:
+        with psycopg.connect(database_url, row_factory=dict_row, connect_timeout=10) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SET statement_timeout = '10s';")
+                cur.execute(query)
+                rows = cur.fetchmany(200)
+                return json.dumps(rows, default=_json_default, indent=2)
+    except Exception as exc:
+        return (
+            "SQL_ERROR: "
+            + exc.__class__.__name__
+            + ": "
+            + str(exc)
+            + "\nInspect the relevant table columns, then rewrite the query using only real table and column names."
+        )
 
 
 system_prompt = f"""
@@ -56,10 +65,11 @@ You are a read-only SQL evidence agent for a {dialect} database.
 Your job:
 - answer questions only by using the run_read_only_sql tool
 - inspect available tables before answering
-- inspect relevant table columns before writing the final query
+- inspect relevant table columns before writing any business-answer query
 - use only SELECT or WITH queries
 - never invent table names
 - never invent column names
+- if a SQL_ERROR is returned, inspect schema and retry once with corrected column names
 - never use INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, COPY, GRANT, REVOKE, or other write/destructive SQL
 - if the database does not contain enough information, say that clearly
 - cite the specific tables you used in your answer
