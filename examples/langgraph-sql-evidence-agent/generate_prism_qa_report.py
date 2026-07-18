@@ -25,12 +25,13 @@ def run_sql_file(path: str, variables: dict[str, str] | None = None) -> list[dic
     cmd = COMPOSE + [
         "exec", "-T", "database",
         "psql", "-U", "user", "-d", "database",
-        "--csv",
+        "--csv", "-v", "ON_ERROR_STOP=1",
     ]
     for name, value in (variables or {}).items():
         cmd += ["-v", f"{name}={value}"]
     # The query goes to psql via stdin (-f -), not -c: psql only interpolates
     # :'variables' in input it processes itself, never in a -c command string.
+    # ON_ERROR_STOP keeps -f failing loudly on SQL errors the way -c did.
     cmd += ["-f", "-"]
     result = subprocess.run(cmd, check=True, capture_output=True, text=True, input=query)
     return list(csv.DictReader(result.stdout.splitlines()))
