@@ -164,9 +164,19 @@ Tasks where:
 - `tasks.status = 'in_progress'`
 - `tasks.due_date` is before the reporting date used by the check
 
-Current lab value:
+The reporting date is a psql variable (`reporting_date`).
+
+The report generator sets it from the `REPORTING_DATE` environment variable.
+
+Default lab value (keeps runs deterministic against the synthetic data):
 
 `2026-05-03`
+
+To run against a different cutoff, for example today:
+
+`REPORTING_DATE=$(date +%F) ./run_prism_qa_report.sh`
+
+The generated report states which reporting date was used.
 
 ### Why it matters
 
@@ -200,14 +210,14 @@ Review the task and decide whether to:
 
 ### False-positive risks
 
-The current lab uses a fixed reporting date.
-
-Future versions should parameterize the reporting date so the check can run against:
+The reporting date is parameterized, so the check can run against:
 
 - today
-- reporting period end date
-- clinic-specific reporting cutoff
-- payer-specific deadline
+- a reporting period end date
+
+A single run still applies one reporting date to every row.
+
+Clinic-specific cutoffs or payer-specific deadlines would need per-row reporting dates sourced from the data, not a single run-level value.
 
 ---
 

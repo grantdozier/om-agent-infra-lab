@@ -1,6 +1,7 @@
 import csv
-import subprocess
+import os
 from pathlib import Path
+import subprocess
 
 COMPOSE = [
     "docker", "compose",
@@ -10,24 +11,37 @@ COMPOSE = [
     "-f", "compose.prism-toy.yaml",
 ]
 
+# Check 3 compares due dates against this reporting date. The default keeps
+# the lab deterministic against the synthetic data. Override for other cutoffs:
+#   REPORTING_DATE=$(date +%F) ./run_prism_qa_report.sh
+REPORTING_DATE = os.environ.get("REPORTING_DATE", "2026-05-03")
+
 REPORT_PATH = Path("reports/prism_qa_report.md")
 REPORT_PATH.parent.mkdir(exist_ok=True)
 
 
-def run_sql_file(path: str) -> list[dict[str, str]]:
+def run_sql_file(path: str, variables: dict[str, str] | None = None) -> list[dict[str, str]]:
     query = Path(path).read_text()
     cmd = COMPOSE + [
         "exec", "-T", "database",
         "psql", "-U", "user", "-d", "database",
-        "--csv", "-c", query,
+        "--csv",
     ]
-    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    for name, value in (variables or {}).items():
+        cmd += ["-v", f"{name}={value}"]
+    # The query goes to psql via stdin (-f -), not -c: psql only interpolates
+    # :'variables' in input it processes itself, never in a -c command string.
+    cmd += ["-f", "-"]
+    result = subprocess.run(cmd, check=True, capture_output=True, text=True, input=query)
     return list(csv.DictReader(result.stdout.splitlines()))
 
 
 proof_gap_rows = run_sql_file("prism_gap_check.sql")
 pending_qa_rows = run_sql_file("prism_pending_qa_check.sql")
-overdue_rows = run_sql_file("prism_overdue_in_progress_check.sql")
+overdue_rows = run_sql_file(
+    "prism_overdue_in_progress_check.sql",
+    variables={"reporting_date": REPORTING_DATE},
+)
 
 lines = [
     "# Prism QA Proof-Gap Report",
@@ -93,7 +107,7 @@ lines.extend([
     "",
     "## Check 3 — In-Progress Tasks Past Due Date",
     "",
-    "Tasks still marked in progress after their due date.",
+    f"Tasks still marked in progress after their due date, as of reporting date {REPORTING_DATE}.",
     "",
 ])
 

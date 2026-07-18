@@ -38,7 +38,7 @@ Completed proof-required tasks where proof exists but QA review is missing or pe
 
 ## Check 3 — In-Progress Tasks Past Due Date
 
-Tasks still marked in progress after their due date.
+Tasks still marked in progress after their due date, as of reporting date 2026-05-03.
 
 1 overdue in-progress task(s) found.
 
