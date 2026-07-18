@@ -43,11 +43,13 @@ The current QA report checks:
 
 1. Completed tasks that require proof but have no proof record.
 2. Completed tasks where proof exists but QA review is missing or pending.
+3. In-progress tasks still open past their due date.
 
 The latest successful run found:
 
 - Missing proof gaps: 1
 - Proof exists but QA pending: 1
+- Overdue in-progress tasks: 1
 
 ## How to run the Prism QA report
 
@@ -79,6 +81,9 @@ Finds completed proof-required tasks missing proof records.
 
 examples/langgraph-sql-evidence-agent/prism_pending_qa_check.sql
 Finds completed proof-required tasks where proof exists but QA is pending or missing.
+
+examples/langgraph-sql-evidence-agent/prism_overdue_in_progress_check.sql
+Finds in-progress tasks still open past their due date.
 
 examples/langgraph-sql-evidence-agent/generate_prism_qa_report.py
 Runs the SQL checks and writes the markdown report.
@@ -118,9 +123,10 @@ The lab has already generated a QA report showing:
 
 - one missing-proof task
 - one pending-QA task
+- one overdue in-progress task
 
 Next recommended slice:
 
-Add Check 3 — in-progress tasks past due date.
+Add Check 4 — tasks completed after their due date.
 
 After that, this lab can become a reusable pattern for Prism, OM Venture OS, and LA.IO Overwatch reporting workflows.
